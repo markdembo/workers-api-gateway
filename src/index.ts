@@ -11,23 +11,48 @@
  const PRESHARED_AUTH_HEADER_KEY = 'X-Custom-PSK';
  const PRESHARED_AUTH_HEADER_VALUE = 'mypresharedkey';
 
+ class AuthError extends Error {}
+ class PathError extends Error {}
+ class RequestError extends Error {}
 
- const checkAuth = (headers: Headers): boolean => {
+ const checkAuth = (headers: Headers): void => {
 	const psk = headers.get(PRESHARED_AUTH_HEADER_KEY);
-	if (psk === PRESHARED_AUTH_HEADER_VALUE) {
-		return true
+	if (psk !== PRESHARED_AUTH_HEADER_VALUE) {
+		throw new AuthError("Invalid key provided.")
 	}
-	return false
   }
 
 
-const getRoute = (request: Request): string | undefined => {
-	console.log(request.url)
-	// TODO: Implement route lookup
-	// TODO: Implement versioning transformation
-	// TODO: Implement Blue/Green deployment
-	return undefined
+const getRoute = (pathName: string): string => {
+	switch (pathName) {
+		case "/weather":
+			return "https://api.open-meteo.com/v1/forecast"
+		case "/random-fact":
+			return "https://uselessfacts.jsph.pl/random.json"
+		default:
+			throw new PathError("Path does not exist.")
+	}
 
+	// TODO: Use KV
+	// TODO: Use versioning
+
+}
+
+const filterHeaders = (headers: Headers): Headers =>{
+	const filteredHeaders = new Headers()
+	headers.forEach((value, key) => {   // Careful, this is very counter-intuitive
+		 if(key!== PRESHARED_AUTH_HEADER_KEY) filteredHeaders.append(key,value)
+	})
+	return filteredHeaders
+}
+
+const fetchRoute = async (route: string, request: Request, searchParams: URLSearchParams) =>{
+	const routeWithQueryParams = (route + "?" + searchParams).replace("%2C", ",")
+	try {
+		return await fetch(routeWithQueryParams, {headers: filterHeaders(request.headers)})
+	} catch (error) {
+		throw new RequestError("Request to origin failed")
+	}
 }
 
 export default {
@@ -35,17 +60,33 @@ export default {
 		request: Request,
 		ctx: ExecutionContext
 		): Promise<Response> {
+		const originalUrl = new URL(request.url)
 
-		const auth = checkAuth(request.headers)
-		if(!auth) return new Response('Sorry, you have supplied an invalid key.', {
-			status: 403,
-		  });
+		try {
+			checkAuth(request.headers)
+			const internalRoute = getRoute(originalUrl.pathname)
+			const response = await fetchRoute(internalRoute, request, originalUrl.searchParams)
+			// TODO: Add log push to Datadog/Sentry/
+			// TODO: Add Mixpanel metric collection
+			return  new Response (await response.text(), { status: response.status, statusText: response.statusText})
+		} catch (error) {
+			if(error instanceof AuthError){
+				return new Response('Sorry, you have supplied an invalid key.', {
+					status: 403,
+				  })
+			} else if (error instanceof PathError){
+				return new Response('Invalid path', {
+					status: 404,
+				  });
+			} else if (error instanceof RequestError){
+				return new Response('Internal server error', {
+					status: 500,
+				  });
+			}
+			else{
+				throw error
+			}
+		} 
 
-		const route = getRoute(request)
-
-		// TODO: Fetch
-		// TODO: Add log push to Datadog/Sentry/
-		// TODO: Add Mixpanel metric collection
-		return new Response("Hello World!");
 	},
 };
