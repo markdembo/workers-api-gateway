@@ -1,3 +1,6 @@
-name = "workers"
+name = "api-gateway"
 main = "src/index.ts"
 compatibility_date = "2022-08-11"
+
+# The necessary secrets are:
+# - MIXPANEL_PROJECT_TOKEN
