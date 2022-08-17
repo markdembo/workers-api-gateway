@@ -2,5 +2,9 @@ name = "api-gateway"
 main = "src/index.ts"
 compatibility_date = "2022-08-11"
 
+kv_namespaces = [
+  { binding = "API_KEYS", id = "04923b6f3f1d401eaeac8cf86c71e688", preview_id = "537b3e1993214195b64411f3f659d51c" }
+]
+
 # The necessary secrets are:
 # - MIXPANEL_PROJECT_TOKEN

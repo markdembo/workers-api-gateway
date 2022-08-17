@@ -1,11 +1,12 @@
 import { AuthError, PathError, RequestError } from "./errors";
-import { checkAuth } from "./auth";
+import {  getKeyFromAuthHeader } from "./auth";
 import { getRoute } from "./router";
 import { fetchRoute } from "./origin-request";
 import { track_api_call } from "./analytics";
 
 interface Env {
 	MIXPANEL_PROJECT_TOKEN: string
+	API_KEYS: KVNamespace
   }
 
 export default {
@@ -16,7 +17,11 @@ export default {
 		): Promise<Response> {
 		const originalUrl = new URL(request.url)
 		try {
-			checkAuth(request.headers)
+			
+			// Authentication
+			const key = await getKeyFromAuthHeader(request.headers, env.API_KEYS)
+			// Authorization
+			
 			const internalRoute = getRoute(originalUrl.pathname)
 			const response = await fetchRoute(internalRoute, request, originalUrl.searchParams)
 			// TODO: Add log push to Datadog/Sentry/
