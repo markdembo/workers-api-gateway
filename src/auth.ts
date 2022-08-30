@@ -27,7 +27,6 @@ export const getKeyFromAuthHeader  = async (headers: Headers, apiKeyKV: KVNamesp
 		throw new AuthError("Invalid key provided.");
 	}
 	const keyFromHeaderHashed = await hash(keyFromHeader)
-	console.log(keyFromHeaderHashed)
 	if (keyFromHeaderHashed === undefined) {
 		throw new Error("Hashing failed.");
 	}
