@@ -7,7 +7,9 @@ import { Logger, NewRelicProvider } from "./logger";
 import {
   AUTH_ERROR_MESSAGE,
   PATH_ERROR_MESSAGE,
+  REQUEST_ENDED_MESSAGE,
   REQUEST_ERROR_MESSAGE,
+  REQUEST_STARTED_MESSAGE,
 } from "./constants/strings";
 
 export interface Env {
@@ -24,7 +26,7 @@ const mainRequestExecution = async (
   let statusCode: number = -1;
   try {
     const originalUrl = new URL(request.url);
-    logger.debug("Request started", {
+    logger.debug(REQUEST_STARTED_MESSAGE, {
       path: originalUrl.pathname,
       headers: request.headers,
     });
@@ -58,7 +60,7 @@ const mainRequestExecution = async (
       throw error;
     }
   } finally {
-    logger.debug("Request finished", { statusCode });
+    logger.debug(REQUEST_ENDED_MESSAGE, { statusCode });
   }
 };
 
