@@ -1,14 +1,16 @@
-export const track_api_call = (user: string, path: string, mixpanel_project_token: string): Promise<Response> => {
+export const track_api_call = (
+  user: string,
+  path: string,
+  mixpanel_project_token: string
+): Promise<Response> => {
   const data = {
     event: "apiCall",
     properties: {
       token: mixpanel_project_token,
       distinct_id: user,
-      path: path
+      path: path,
     },
   };
-
-
 
   const options: RequestInit = {
     method: "POST",

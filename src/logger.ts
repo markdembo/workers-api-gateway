@@ -1,6 +1,5 @@
 import { AdditionalProperties, LogEntry, LogLevelEnum, LogLevels } from "types";
 
-
 export class Logger {
   logs: LogEntry[];
   commonAttributes: {};
@@ -98,7 +97,6 @@ export class NewRelicProvider extends LogProvider {
         },
         body: JSON.stringify(body),
       });
-
     });
   }
 }

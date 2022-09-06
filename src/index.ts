@@ -4,7 +4,11 @@ import { getRoute } from "./router";
 import { fetchRoute } from "./origin-request";
 import { track_api_call } from "./analytics";
 import { Logger, NewRelicProvider } from "./logger";
-import { AUTH_ERROR_MESSAGE, PATH_ERROR_MESSAGE, REQUEST_ERROR_MESSAGE } from "./constants/strings";
+import {
+  AUTH_ERROR_MESSAGE,
+  PATH_ERROR_MESSAGE,
+  REQUEST_ERROR_MESSAGE,
+} from "./constants/strings";
 
 export interface Env {
   MIXPANEL_PROJECT_TOKEN: string;
@@ -12,16 +16,14 @@ export interface Env {
   API_KEYS: KVNamespace;
 }
 
-
 export default {
   async fetch(
     request: Request,
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-
-    const logProvider = new NewRelicProvider(env.NEW_RELIC_LICENSE_KEY)
-    const logger = new Logger(logProvider,{...request});
+    const logProvider = new NewRelicProvider(env.NEW_RELIC_LICENSE_KEY);
+    const logger = new Logger(logProvider, { ...request });
     let statusCode: number = -1;
     try {
       const originalUrl = new URL(request.url);
@@ -33,10 +35,7 @@ export default {
       const key = await getKeyFromAuthHeader(request.headers, env.API_KEYS);
       // Authorization
       const internalRoute = getRoute(originalUrl.pathname);
-      const response = await fetchRoute(
-        internalRoute,
-        request,
-      );
+      const response = await fetchRoute(internalRoute, request);
       statusCode = response.status;
       ctx.waitUntil(
         track_api_call(
@@ -70,7 +69,6 @@ export default {
       }
     } finally {
       logger.debug("Resquest finished", { statusCode });
-
 
       ctx.waitUntil(logger.flush());
     }
