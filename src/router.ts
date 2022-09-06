@@ -1,15 +1,10 @@
+import { Route } from "types";
+import { ROUTES } from "./constants/routes";
+import { PATH_ERROR_LOG_MESSAGE } from "./constants/strings";
 import { PathError } from "./errors";
 
-export const getRoute = (pathName: string): string => {
-	switch (pathName) {
-		case "/weather":
-			return "https://api.open-meteo.com/v1/forecast";
-		case "/random-fact":
-			return "https://uselessfacts.jsph.pl/random.json";
-		default:
-			throw new PathError("Path does not exist.");
-	}
-
-	// TODO: Use KV
-	// TODO: Use versioning
+export const getRoute = (pathName: string): Route => {
+	const mappedRoute = ROUTES.find(route => pathName.startsWith(route.externalPath))
+	if (!mappedRoute) throw new PathError(PATH_ERROR_LOG_MESSAGE);
+	return mappedRoute
 };

@@ -4,6 +4,7 @@ import { getRoute } from "./router";
 import { fetchRoute } from "./origin-request";
 import { track_api_call } from "./analytics";
 import { Logger, NewRelicProvider } from "./logger";
+import { AUTH_ERROR_MESSAGE, PATH_ERROR_MESSAGE, REQUEST_ERROR_MESSAGE } from "./constants/strings";
 
 export interface Env {
   MIXPANEL_PROJECT_TOKEN: string;
@@ -11,12 +12,14 @@ export interface Env {
   API_KEYS: KVNamespace;
 }
 
+
 export default {
   async fetch(
     request: Request,
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
+
     const logProvider = new NewRelicProvider(env.NEW_RELIC_LICENSE_KEY)
     const logger = new Logger(logProvider,{...request});
     let statusCode: number = -1;
@@ -33,7 +36,6 @@ export default {
       const response = await fetchRoute(
         internalRoute,
         request,
-        originalUrl.searchParams
       );
       statusCode = response.status;
       ctx.waitUntil(
@@ -50,17 +52,17 @@ export default {
     } catch (error) {
       if (error instanceof AuthError) {
         statusCode = 403;
-        return new Response("Sorry, you have supplied an invalid key.", {
+        return new Response(AUTH_ERROR_MESSAGE, {
           status: statusCode,
         });
       } else if (error instanceof PathError) {
         statusCode = 404;
-        return new Response("Invalid path", {
+        return new Response(PATH_ERROR_MESSAGE, {
           status: statusCode,
         });
       } else if (error instanceof RequestError) {
         statusCode = 500;
-        return new Response("Internal server error", {
+        return new Response(REQUEST_ERROR_MESSAGE, {
           status: statusCode,
         });
       } else {
