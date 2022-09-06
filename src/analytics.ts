@@ -1,8 +1,3 @@
-
-declare global {
-  const MIXPANEL_PROJECT_TOKEN: string
-}
-
 export const track_api_call = (user: string, path: string, mixpanel_project_token: string): Promise<Response> => {
   const data = {
     event: "apiCall",

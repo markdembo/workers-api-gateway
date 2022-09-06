@@ -1,14 +1,7 @@
+import { KeyObject } from "types";
 import { AuthError } from "./errors";
 
 export const PRESHARED_AUTH_HEADER_KEY = 'x-api-key';
-
-type UUID = string
-
-type KeyObject = {
-	"id": UUID,
-	"consumerName": UUID,
-	"allowedRouteIds": UUID[]
-  }
 
 
 // From: https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#examples

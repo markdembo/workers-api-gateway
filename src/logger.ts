@@ -1,28 +1,5 @@
-type AdditionalProperties = {
-  [key: string]: string | number | Object;
-};
+import { AdditionalProperties, LogEntry, LogLevelEnum, LogLevels } from "types";
 
-type LogEntry = {
-  level: LogLevels;
-  message: string;
-  time: Date;
-  properties?: AdditionalProperties;
-};
-
-enum LogLevelEnum {
-  debug = 10,
-  info = 20,
-  warning = 30,
-  error = 40,
-  critical = 50,
-}
-
-type LogLevels =
-  | LogLevelEnum.info
-  | LogLevelEnum.debug
-  | LogLevelEnum.error
-  | LogLevelEnum.critical
-  | LogLevelEnum.warning;
 
 export class Logger {
   logs: LogEntry[];
