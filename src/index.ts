@@ -9,6 +9,8 @@ import {
   HTTP_403_PATH_FORBITTEN,
   HTTP_404_INVALID_PATH,
   HTTP_500_GENERAL,
+  LOG_INFO_FORBIDDEN_ROUTE,
+  LOG_INFO_INVALID_PATH,
   REQUEST_ENDED_MESSAGE,
 } from "./constants/strings";
 
@@ -43,26 +45,30 @@ const mainRequestExecution = async (
         status: statusCode,
       });
     } else if (error instanceof PermissionError) {
-      logger.info("Client requested forbidden path");
+      logger.info(LOG_INFO_FORBIDDEN_ROUTE);
       statusCode = 403;
       return new Response(HTTP_403_PATH_FORBITTEN, {
         status: statusCode,
       });
     } else if (error instanceof PathError) {
-      logger.info("Client requested invalid path");
+      logger.info(LOG_INFO_INVALID_PATH);
       statusCode = 404;
       return new Response(HTTP_404_INVALID_PATH, {
         status: statusCode,
       });
     } else if (error instanceof RequestError) {
+      logger.error(error.message);
+      statusCode = 526;
+      return new Response(HTTP_500_GENERAL, {
+        status: statusCode,
+      });
+    } else {
       if (error instanceof Error) logger.error(error.message);
       else logger.error(String(error));
       statusCode = 500;
       return new Response(HTTP_500_GENERAL, {
         status: statusCode,
       });
-    } else {
-      throw error;
     }
   } finally {
     logger.debug(REQUEST_ENDED_MESSAGE, { statusCode });

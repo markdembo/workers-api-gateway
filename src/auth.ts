@@ -1,4 +1,9 @@
 import { KeyObject, Route } from "types";
+import {
+  LOG_ERROR_HASH_FAILED,
+  LOG_INFO_INVALID_KEY,
+  LOG_INFO_NO_KEY,
+} from "./constants/strings";
 import { AuthError, PermissionError } from "./errors";
 
 export const PRESHARED_AUTH_HEADER_KEY = "x-api-key";
@@ -20,15 +25,15 @@ export const checkAuthentication = async (
 ): Promise<KeyObject> => {
   const keyFromHeader = headers.get(PRESHARED_AUTH_HEADER_KEY);
   if (keyFromHeader === null) {
-    throw new AuthError("Invalid key provided.");
+    throw new AuthError(LOG_INFO_NO_KEY);
   }
   const keyFromHeaderHashed = await hash(keyFromHeader);
   if (keyFromHeaderHashed === undefined) {
-    throw new Error("Hashing failed.");
+    throw new Error(LOG_ERROR_HASH_FAILED);
   }
   const keyObject = await apiKeyKV.get(keyFromHeaderHashed.trim(), "json");
   if (keyObject === null) {
-    throw new AuthError("Invalid key provided.");
+    throw new AuthError(LOG_INFO_INVALID_KEY);
   }
   return keyObject as KeyObject;
 };
