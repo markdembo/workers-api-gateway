@@ -8,3 +8,7 @@ kv_namespaces = [
 
 # The necessary secrets are:
 # - MIXPANEL_PROJECT_TOKEN
+# - NEW_RELIC_API_TOKEN
+
+[vars]
+LOG_LEVEL = 10

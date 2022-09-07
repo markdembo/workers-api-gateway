@@ -3,7 +3,7 @@ import { checkAuthentication, checkAuthorization } from "./auth";
 import { getRoute } from "./router";
 import { fetchOrigin } from "./origin-request";
 import { track_api_call } from "./analytics";
-import { Logger, NewRelicProvider } from "./logger";
+import { ConsoleLogProvider, Logger, NewRelicProvider } from "./logger";
 import {
   HTTP_401_NO_OR_INVALID_KEY,
   HTTP_403_PATH_FORBITTEN,
@@ -13,10 +13,12 @@ import {
   LOG_INFO_INVALID_PATH,
   REQUEST_ENDED_MESSAGE,
 } from "./constants/strings";
+import { LogLevels } from "types";
 
 export interface Env {
   MIXPANEL_PROJECT_TOKEN: string;
   NEW_RELIC_LICENSE_KEY: string;
+  LOG_LEVEL: LogLevels | undefined;
   API_KEYS: KVNamespace;
 }
 
@@ -100,9 +102,10 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    const logProvider = new NewRelicProvider(env.NEW_RELIC_LICENSE_KEY);
-    const logger = new Logger(logProvider, { ...request });
-    const response = mainRequestExecution(request, env, logger);
+    // const logProvider = new NewRelicProvider(env.NEW_RELIC_LICENSE_KEY);
+    const logProvider = new ConsoleLogProvider();
+    const logger = new Logger(logProvider, { ...request }, env.LOG_LEVEL);
+    const response = await mainRequestExecution(request, env, logger);
     postRequestExecution(request, env, ctx, logger);
     return response;
   },

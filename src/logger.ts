@@ -4,11 +4,17 @@ export class Logger {
   logs: LogEntry[];
   commonAttributes: {};
   logProvider: LogProvider;
+  logLevel: LogLevels;
 
-  constructor(logProvider: LogProvider, commonAttributes?: Object) {
+  constructor(
+    logProvider: LogProvider,
+    commonAttributes?: Object,
+    logLevel?: LogLevels | undefined
+  ) {
     this.logs = [];
     this.commonAttributes = { ...commonAttributes };
     this.logProvider = logProvider;
+    this.logLevel = logLevel ? logLevel : 30;
   }
 
   private log(
@@ -22,6 +28,14 @@ export class Logger {
       message,
       properties,
     });
+  }
+
+  private getLogLevelLogs(): LogEntry[] {
+    return this.logs.filter((log) => log.level >= this.logLevel);
+  }
+
+  setLogLevel(level: LogLevels) {
+    this.logLevel = level;
   }
 
   debug(message: string, properties?: AdditionalProperties) {
@@ -45,7 +59,7 @@ export class Logger {
   }
 
   async flush() {
-    this.logProvider.flush(this.logs, this.commonAttributes);
+    this.logProvider.flush(this.getLogLevelLogs(), this.commonAttributes);
   }
 }
 
@@ -97,6 +111,33 @@ export class NewRelicProvider extends LogProvider {
         },
         body: JSON.stringify(body),
       });
+    });
+  }
+}
+
+export class ConsoleLogProvider extends LogProvider {
+  constructor() {
+    super("Console");
+  }
+
+  format(
+    log: LogEntry,
+    commonAttributes?: Record<string, any>
+  ): Record<string, any> {
+    const outputLog = {
+      ...log.properties,
+      ...commonAttributes,
+      timestamp: log.time.getTime(),
+      message: log.message,
+      level: log.level,
+    };
+    return outputLog;
+  }
+
+  async flush(logs: LogEntry[], commonAttributes?: Record<string, any>) {
+    logs.forEach((log) => {
+      const body = this.format(log, commonAttributes);
+      console.log(JSON.stringify(body));
     });
   }
 }
