@@ -1,5 +1,5 @@
-import { KeyObject } from "types";
-import { AuthError } from "./errors";
+import { KeyObject, Route } from "types";
+import { AuthError, PermissionError } from "./errors";
 
 export const PRESHARED_AUTH_HEADER_KEY = "x-api-key";
 
@@ -14,7 +14,7 @@ const hash = async (text: string) => {
   return hashHex;
 };
 
-export const getKeyFromAuthHeader = async (
+export const checkAuthentication = async (
   headers: Headers,
   apiKeyKV: KVNamespace
 ): Promise<KeyObject> => {
@@ -31,4 +31,10 @@ export const getKeyFromAuthHeader = async (
     throw new AuthError("Invalid key provided.");
   }
   return keyObject as KeyObject;
+};
+
+export const checkAuthorization = (key: KeyObject, route: Route) => {
+  if (!key.allowedExternalPaths.includes(route.externalPath)) {
+    throw new PermissionError();
+  }
 };

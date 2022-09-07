@@ -1,8 +1,5 @@
 {
   "id": "7df129ce-7f1d-42c8-86cf-712b09add745",
   "consumerName": "BigCorp",
-  "allowedRouteIds": [
-    "2813bfff-4fc2-4f54-947f-ac287a727581",
-    "cd23cbe6-f0f6-41b2-b931-b3bde0fbb9fa"
-  ]
+  "allowedExternalPaths": ["/weather", "/random-fact"]
 }

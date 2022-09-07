@@ -1,15 +1,15 @@
-import { AuthError, PathError, RequestError } from "./errors";
-import { getKeyFromAuthHeader } from "./auth";
+import { AuthError, PathError, PermissionError, RequestError } from "./errors";
+import { checkAuthentication, checkAuthorization } from "./auth";
 import { getRoute } from "./router";
-import { fetchRoute } from "./origin-request";
+import { fetchOrigin } from "./origin-request";
 import { track_api_call } from "./analytics";
 import { Logger, NewRelicProvider } from "./logger";
 import {
-  AUTH_ERROR_MESSAGE,
-  PATH_ERROR_MESSAGE,
+  HTTP_401_NO_OR_INVALID_KEY,
+  HTTP_403_PATH_FORBITTEN,
+  HTTP_404_INVALID_PATH,
+  HTTP_500_GENERAL,
   REQUEST_ENDED_MESSAGE,
-  REQUEST_ERROR_MESSAGE,
-  REQUEST_STARTED_MESSAGE,
 } from "./constants/strings";
 
 export interface Env {
@@ -26,15 +26,10 @@ const mainRequestExecution = async (
   let statusCode: number = -1;
   try {
     const originalUrl = new URL(request.url);
-    logger.debug(REQUEST_STARTED_MESSAGE, {
-      path: originalUrl.pathname,
-      headers: request.headers,
-    });
-    // Authentication
-    const key = await getKeyFromAuthHeader(request.headers, env.API_KEYS);
-    // Authorization
-    const internalRoute = getRoute(originalUrl.pathname);
-    const response = await fetchRoute(internalRoute, request);
+    const key = await checkAuthentication(request.headers, env.API_KEYS);
+    const route = getRoute(originalUrl.pathname);
+    checkAuthorization(key, route);
+    const response = await fetchOrigin(route, request);
     statusCode = response.status;
     return new Response(await response.text(), {
       status: statusCode,
@@ -42,18 +37,28 @@ const mainRequestExecution = async (
     });
   } catch (error) {
     if (error instanceof AuthError) {
+      logger.info(error.message);
+      statusCode = 401;
+      return new Response(HTTP_401_NO_OR_INVALID_KEY, {
+        status: statusCode,
+      });
+    } else if (error instanceof PermissionError) {
+      logger.info("Client requested forbidden path");
       statusCode = 403;
-      return new Response(AUTH_ERROR_MESSAGE, {
+      return new Response(HTTP_403_PATH_FORBITTEN, {
         status: statusCode,
       });
     } else if (error instanceof PathError) {
+      logger.info("Client requested invalid path");
       statusCode = 404;
-      return new Response(PATH_ERROR_MESSAGE, {
+      return new Response(HTTP_404_INVALID_PATH, {
         status: statusCode,
       });
     } else if (error instanceof RequestError) {
+      if (error instanceof Error) logger.error(error.message);
+      else logger.error(String(error));
       statusCode = 500;
-      return new Response(REQUEST_ERROR_MESSAGE, {
+      return new Response(HTTP_500_GENERAL, {
         status: statusCode,
       });
     } else {

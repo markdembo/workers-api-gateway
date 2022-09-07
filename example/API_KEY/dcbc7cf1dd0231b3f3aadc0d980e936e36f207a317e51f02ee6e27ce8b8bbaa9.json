@@ -1,0 +1,5 @@
+{
+  "id": "aeb6bb80-0619-41fd-a780-86fd3cf4e18a",
+  "consumerName": "NewEnterprises",
+  "allowedExternalPaths": ["/weather", "/random-fact", "json-server"]
+}

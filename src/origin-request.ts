@@ -24,7 +24,7 @@ export const getInternalRoute = (route: Route, request: Request): string => {
   }
 };
 
-export const fetchRoute = async (route: Route, request: Request) => {
+export const fetchOrigin = async (route: Route, request: Request) => {
   // Construct new URL based on route
   const internalRoute = getInternalRoute(route, request);
   const originalUrl = new URL(request.url);
