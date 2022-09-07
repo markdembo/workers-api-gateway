@@ -19,7 +19,7 @@
     "start": "wrangler dev",
     "deploy": "wrangler publish",
     "build": "node build.js",
-    "test": "npm run build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js",
+    "test": "npm run build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js --coverage",
     "types:check": "tsc && tsc -p test/tsconfig.json",
     "prettier": "prettier --write 'src/**/*.ts' && prettier --write 'types/**/*.ts' && prettier --write 'test/**/*.{ts,json}' "
   }

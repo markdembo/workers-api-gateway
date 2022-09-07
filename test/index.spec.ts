@@ -9,7 +9,7 @@ class ExecutionContext {
   passThroughOnException() {}
 }
 
-test("should throw 403 without API Key", async () => {
+test("should throw 401 without API Key", async () => {
   const mf = new Miniflare({
     envPath: true,
     packagePath: true,
@@ -19,5 +19,5 @@ test("should throw 403 without API Key", async () => {
   const env = getMiniflareBindings() as Env;
   const ctx = new ExecutionContext();
   const res = await handler.fetch(new Request("http://localhost"), env, ctx);
-  expect(res.status).toBe(403);
+  expect(res.status).toBe(401);
 });

@@ -1,4 +1,9 @@
-import { AdditionalProperties, LogEntry, LogLevelEnum, LogLevels } from "types";
+import {
+  AdditionalProperties,
+  LogEntry,
+  LogLevelEnum,
+  LogLevels,
+} from "../types";
 
 export class Logger {
   logs: LogEntry[];

@@ -1,9 +1,9 @@
-import { AuthError, PathError, PermissionError, RequestError } from "./errors";
-import { checkAuthentication, checkAuthorization } from "./auth";
-import { getRoute } from "./router";
-import { fetchOrigin } from "./origin-request";
-import { track_api_call } from "./analytics";
-import { ConsoleLogProvider, Logger, NewRelicProvider } from "./logger";
+import { AuthError, PathError, PermissionError, RequestError } from "@/errors";
+import { checkAuthentication, checkAuthorization } from "@/auth";
+import { getRoute } from "@/router";
+import { fetchOrigin } from "@/origin-request";
+import { track_api_call } from "@/analytics";
+import { ConsoleLogProvider, Logger, NewRelicProvider } from "@/logger";
 import {
   HTTP_401_NO_OR_INVALID_KEY,
   HTTP_403_PATH_FORBITTEN,
