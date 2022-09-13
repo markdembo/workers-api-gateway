@@ -13,3 +13,4 @@
 - Bring test coverage above 80%
 - Add logging in all functions
 - Add Analytics Engine metrics collection
+- Add a "list" routes endpoint
