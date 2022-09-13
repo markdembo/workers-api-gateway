@@ -5,4 +5,14 @@ export default {
     scriptPath: "dist/index.mjs",
     modules: true,
   },
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
+  globals: {
+    "ts-jest": {
+      tsconfig: "test/tsconfig.json",
+      useESM: true,
+    },
+  },
 };
