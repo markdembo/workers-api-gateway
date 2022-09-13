@@ -16,10 +16,10 @@
   "module": "./dist/index.mjs",
   "build": "esbuild --bundle --sourcemap --outdir=dist ./src/index.js",
   "scripts": {
-    "start": "wrangler dev",
+    "dev": "miniflare --live-reload --debug --modules dist/index.mjs",
     "deploy": "wrangler publish",
     "build": "node build.js",
-    "test": "npm run build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js --coverage",
+    "test": "npm run build && node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "types:check": "tsc && tsc -p test/tsconfig.json",
     "prettier": "prettier --write 'src/**/*.ts' && prettier --write 'types/**/*.ts' && prettier --write 'test/**/*.{ts,json}' "
   }
